@@ -39,21 +39,33 @@ public:
     }
 };
 
-void getcommand(FRAGE * &all);
-void randquiz(FRAGE * & all, int len);
-void ask(FRAGE & f, FRAGE * & all);
+class STATUS
+{
+public:
+    FRAGE * all;
+    int * perm;
+    int aktuell;
+    int quizid;
+};
+
+void getcommand(STATUS & quo);
+void randquiz(STATUS & quo);
+void ask(FRAGE & f, STATUS & quo);
 void korrekt(FRAGE & f);
 void inkorrekt(FRAGE & f);
-void themenquiz(FRAGE * & all);
-void schwer(FRAGE * & all);
-void thxschwer(FRAGE * & all);
+void permutiere(STATUS & quo);
+void themenquiz(STATUS & quo);
+void schwer(STATUS & quo);
+void thxschwer(STATUS & quo);
 void help();
 void ansage();
-void schluss(FRAGE * & all);
+void schluss(STATUS & quo);
 
 int main()
 {
-    FRAGE * all;
+    STATUS quo;
+    quo.aktuell=0;
+    quo.quizid=0;
     ifstream r;
     r.open(fragen.c_str());
     string ln;
@@ -65,7 +77,7 @@ int main()
     }
     try
     {
-        all = new FRAGE[alllength];
+        quo.all = new FRAGE[alllength];
     }
     catch (exception e)
     {
@@ -89,20 +101,20 @@ int main()
             ids += ln[3];
             ids += ln[4];
             ln.erase(0,6);
-            all[current].id = atoi(ids.c_str());
-            all[current].q = ln;
+            quo.all[current].id = atoi(ids.c_str());
+            quo.all[current].q = ln;
         }
         else if(ln[0]=='-')
         {
             ln.erase(0,1);
-            all[current].c.push_back(false);
-            all[current].a.push_back(ln);
+            quo.all[current].c.push_back(false);
+            quo.all[current].a.push_back(ln);
         }
         else if(ln[0]=='+')
         {
             ln.erase(0,1);
-            all[current].c.push_back(true);
-            all[current].a.push_back(ln);
+            quo.all[current].c.push_back(true);
+            quo.all[current].a.push_back(ln);
         }
     }
     cout << "Laden erfolgreich" << endl;
@@ -121,10 +133,10 @@ int main()
             ln.erase(0,6);
             int idi = atoi(ids.c_str());
             for(int i = 0; i<alllength; ++i)
-                if(all[i].id == idi)
+                if(quo.all[i].id == idi)
                 {
-                    all[i].history = ln;
-                    all[i].update();
+                    quo.all[i].history = ln;
+                    quo.all[i].update();
                 }
         }
         cout << "Laden erfolgreich" << endl;
@@ -132,58 +144,68 @@ int main()
     else
         cout << "Kein Verlauf vorhanden" << endl;
     r.close();
-    //ask(all[2]); //Testen der Fragenfkt.
+    //HIER den eventuellen Abbruchsstatus laden
+    //schluss noch zum korrekten Abspeichern bringen
+    //und natuerlich Einlesefunktion fuer Abbruchsstatus schreiben
     while(true)
-        getcommand(all);
+        getcommand(quo);
     return 0;
 }
 
-void getcommand(FRAGE * & all)
+void getcommand(STATUS & quo)
 {
     string comm;
     cout << "> ";
     getline(cin, comm);
     size_t np = string::npos;
     if(comm.find("exit")!=np)
-        schluss(all);
+        schluss(quo);
     else if(comm.find("quiz")!=np)
-        randquiz(all, alllength);
+        {permutiere(quo); randquiz(quo);}
     else if(comm.find("thschwer")!=np)
-        thxschwer(all);
+        {permutiere(quo);thxschwer(quo);}
     else if(comm.find("thema")!=np)
-        themenquiz(all);
+        {permutiere(quo);themenquiz(quo);}
     else if(comm.find("schwer")!=np)
-        schwer(all);
+        {permutiere(quo);schwer(quo);}
     else
         help();
 }
 
-void randquiz(FRAGE * & all, int len)
+void permutiere(STATUS & quo)
 {
-    ansage();
-    int * perm;
-    perm = new int[len];
+    int len = alllength;
+    quo.perm = new int[len];
     int zs, m, n;
     srand(time(NULL));
     for(int i = 0; i<len; ++i)
-        perm[i]=i;
+        quo.perm[i]=i;
     for(int i = 0; i<len*2; ++i)
     {
         m=rand()%len;
         n=rand()%len;
         if(m!=n)
         {
-            zs=perm[m];
-            perm[m]=perm[n];
-            perm[n]=zs;
+            zs=quo.perm[m];
+            quo.perm[m]=quo.perm[n];
+            quo.perm[n]=zs;
         }
     }
-    for(int i = 0; i<len; ++i)
-        ask(all[perm[i]], all);
-    cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
 }
 
-void ask(FRAGE & f, FRAGE * & all)
+void randquiz(STATUS & quo)
+{
+    quo.quizid=10;
+    int len = alllength;
+    ansage();
+    for(int i = quo.aktuell; i<len; ++i)
+        ask(quo.all[quo.perm[i]], quo);
+    cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
+    quo.quizid=0;
+    quo.aktuell=0;
+}
+
+void ask(FRAGE & f, STATUS & quo)
 {
     cout << endl << "(" << f.id << ") [" << f.cor << "|" << f.fal << "]" << endl;
     cout << f.q << endl << endl;
@@ -201,7 +223,7 @@ void ask(FRAGE & f, FRAGE * & all)
     string antwort;
     getline(cin, antwort);
     if(antwort.find("exit")!=string::npos)
-        schluss(all);
+        schluss(quo);
     bool corr = true;
     //cout << richtig.str() << "  " << falsch.str() << endl;
     for(int i = 0; i<richtig.str().length(); ++i)
@@ -240,36 +262,22 @@ void inkorrekt(FRAGE & f)
     f.history+="0";
 }
 
-void schwer(FRAGE * & all)
+void schwer(STATUS & quo)
 {
+    quo.quizid=20;
     ansage();
     int len = alllength;
-    int * perm;
-    perm = new int[len];
-    int zs, m, n;
-    srand(time(NULL));
-    for(int i = 0; i<len; ++i)
-        perm[i]=i;
-    for(int i = 0; i<len*2; ++i)
-    {
-        m=rand()%len;
-        n=rand()%len;
-        if(m!=n)
+    for(int i = quo.aktuell; i<len; ++i)
+        if(quo.all[quo.perm[i]].history.size()>2)
         {
-            zs=perm[m];
-            perm[m]=perm[n];
-            perm[n]=zs;
-        }
-    }
-    for(int i = 0; i<len; ++i)
-        if(all[perm[i]].history.size()>2)
-        {
-            if(all[perm[i]].rate<=0.8)
-                ask(all[perm[i]], all);
+            if(quo.all[quo.perm[i]].rate<=0.8)
+                ask(quo.all[quo.perm[i]], quo);
         }
         else
-            ask(all[perm[i]], all);
+            ask(quo.all[quo.perm[i]], quo);
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
+    quo.quizid=0;
+    quo.aktuell=0;
 }
 
 void help()
@@ -286,9 +294,10 @@ void help()
     cout << "           um abzubrechen" << endl << endl;
 }
 
-void themenquiz(FRAGE * & all)
+void themenquiz(STATUS & quo)
 {
-    cout << "Themenbereiche:" << endl;
+    if(quo.quizid==0)
+    {cout << "Themenbereiche:" << endl;
     cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
     cout << "2 - Biologie der WIldarten" << endl;
     cout << "3 - Rechtliche Vorschriften" << endl;
@@ -306,34 +315,23 @@ void themenquiz(FRAGE * & all)
         getline(cin, the);
         th = atoi(the.c_str());
     }
+    quo.quizid=10+th;}
+    int th = quo.quizid-10;
     ansage();
     int len = alllength;
-    int * perm;
-    perm = new int[len];
-    int zs, m, n;
-    srand(time(NULL));
-    for(int i = 0; i<len; ++i)
-        perm[i]=i;
-    for(int i = 0; i<len*2; ++i)
-    {
-        m=rand()%len;
-        n=rand()%len;
-        if(m!=n)
-        {
-            zs=perm[m];
-            perm[m]=perm[n];
-            perm[n]=zs;
-        }
-    }
-    for(int i = 0; i<len; ++i)
-        if(all[perm[i]].id <(th+1)*1000&&all[perm[i]].id>=th*1000)
-            ask(all[perm[i]], all);
+    for(int i = quo.aktuell; i<len; ++i)
+        if(quo.all[quo.perm[i]].id <(th+1)*1000&&quo.all[quo.perm[i]].id>=th*1000)
+            ask(quo.all[quo.perm[i]], quo);
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
+    quo.aktuell=0;
+    quo.quizid=0;
 }
 
-void thxschwer(FRAGE * & all)
+void thxschwer(STATUS & quo)
 {
-    cout << "Themenbereiche:" << endl;
+    if(quo.quizid==0)
+    {
+        cout << "Themenbereiche:" << endl;
     cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
     cout << "2 - Biologie der WIldarten" << endl;
     cout << "3 - Rechtliche Vorschriften" << endl;
@@ -351,37 +349,25 @@ void thxschwer(FRAGE * & all)
         getline(cin, the);
         th = atoi(the.c_str());
     }
+    quo.quizid=20+th;
+    }
+    int th = quo.quizid-20;
     ansage();
     int len = alllength;
-    int * perm;
-    perm = new int[len];
-    int zs, m, n;
-    srand(time(NULL));
-    for(int i = 0; i<len; ++i)
-        perm[i]=i;
-    for(int i = 0; i<len*2; ++i)
-    {
-        m=rand()%len;
-        n=rand()%len;
-        if(m!=n)
+    for(int i = quo.aktuell; i<len; ++i)
+        if(quo.all[quo.perm[i]].id <(th+1)*1000&&quo.all[quo.perm[i]].id>=th*1000)
         {
-            zs=perm[m];
-            perm[m]=perm[n];
-            perm[n]=zs;
-        }
-    }
-    for(int i = 0; i<len; ++i)
-        if(all[perm[i]].id <(th+1)*1000&&all[perm[i]].id>=th*1000)
-        {
-            if(all[perm[i]].history.size()>2)
+            if(quo.all[quo.perm[i]].history.size()>2)
             {
-                if(all[perm[i]].rate<=0.8)
-                    ask(all[perm[i]], all);
+                if(quo.all[quo.perm[i]].rate<=0.8)
+                    ask(quo.all[quo.perm[i]], quo);
             }
             else
-                ask(all[perm[i]], all);
+                ask(quo.all[quo.perm[i]], quo);
         }
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
+    quo.quizid=0;
+    quo.aktuell=0;
 }
 
 void ansage()
@@ -391,7 +377,7 @@ void ansage()
     cout << "Wichtig ist lediglich, dass alle korrekten Ziffern vorkommen und keine der falschen" << endl;
 }
 
-void schluss(FRAGE * & all)
+void schluss(STATUS & quo)
 {
     cout << "Programm speichert und schliesst" << endl;
     ofstream o;
@@ -399,7 +385,7 @@ void schluss(FRAGE * & all)
     if(o)
         for(int i = 0; i<alllength; ++i)
         {
-            o << "#" << all[i].id << "#" << all[i].history << endl;
+            o << "#" << quo.all[i].id << "#" << quo.all[i].history << endl;
         }
     o.close();
     exit(0);
