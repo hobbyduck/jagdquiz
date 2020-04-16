@@ -12,6 +12,7 @@ using namespace std;
 int alllength;
 const string fragen = "dat/Fragen.txt";
 const string hist = "dat/hist.txt";
+const string statu = "dat/status.txt";
 
 class FRAGE
 {
@@ -49,6 +50,8 @@ public:
 };
 
 void getcommand(STATUS & quo);
+bool readstat(STATUS & quo);
+void writestat(STATUS & quo);
 void randquiz(STATUS & quo);
 void ask(FRAGE & f, STATUS & quo);
 void korrekt(FRAGE & f);
@@ -144,9 +147,40 @@ int main()
     else
         cout << "Kein Verlauf vorhanden" << endl;
     r.close();
-    //HIER den eventuellen Abbruchsstatus laden
-    //schluss noch zum korrekten Abspeichern bringen
-    //und natuerlich Einlesefunktion fuer Abbruchsstatus schreiben
+    cout << "Versuche Zwischenspeicher zu laden" << endl;
+    if(readstat(quo))
+    {
+        cout << "Laden erfolgreich" << endl;
+        if(quo.aktuell!=0)
+        {
+            cout << "Es sieht aus, als waere das Quiz der letzten" << endl;
+            cout << "Sitzung noch nicht zuende" << endl;
+            cout << "Genau dort weitermachen? (j/n) " << endl;
+            string in;
+            getline(cin, in);
+            if(in.find("j")!=string::npos)
+            {
+                if(quo.quizid>20)
+                    thxschwer(quo);
+                else if(quo.quizid==20)
+                    schwer(quo);
+                else if(quo.quizid>10)
+                    themenquiz(quo);
+                else if(quo.quizid==10)
+                    randquiz(quo);
+            }
+            else
+            {
+                quo.quizid = 0;
+                quo.aktuell = 0;
+                //cout << "aktuell - " << quo.aktuell << endl;
+            }
+        }
+    }
+    else
+    {
+        cout << "Kein Zwischenspeicher" << endl;
+    }
     while(true)
         getcommand(quo);
     return 0;
@@ -198,11 +232,69 @@ void randquiz(STATUS & quo)
     quo.quizid=10;
     int len = alllength;
     ansage();
-    for(int i = quo.aktuell; i<len; ++i)
-        ask(quo.all[quo.perm[i]], quo);
+    for(; quo.aktuell<len; ++quo.aktuell)
+        ask(quo.all[quo.perm[quo.aktuell]], quo);
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
     quo.quizid=0;
     quo.aktuell=0;
+}
+
+void writestat(STATUS & quo)
+{
+    ofstream w;
+    w.open(statu.c_str());
+    w << "#" << quo.quizid << "#" << "quizid#" << endl;
+    w << "#" << quo.aktuell << "#" << "aktuell#" << endl;
+    w << "#perm#" << endl;
+    for(int i = 0; i<alllength; ++i)
+        w << quo.perm[i] << endl;
+    w << "#permend#" << endl;
+}
+
+bool readstat(STATUS & quo)
+{
+    ifstream r;
+    r.open(statu.c_str());
+    string ln;
+    int a = 0;
+    quo.perm = new int[alllength];
+    while(getline(r,ln))
+    {
+        if(ln=="#perm#"&&a==2)
+        {
+            //cout << "lese perm" << endl;
+            int i = 0;
+            while(getline(r,ln)&&i<alllength)
+            {
+                quo.perm[i]=atoi(ln.c_str());
+                ++i;
+                //cout << atoi(ln.c_str()) << endl;
+            }
+            if(ln=="#permend#")
+            {
+                //cout << "perm gelesen" << endl;
+                r.close();
+                //cout << quo.aktuell << " (aktuell); " << quo.quizid << " (quizid);" << endl;
+                return true;
+            }
+        }
+        else if(ln[0]=='#')
+        {
+            string ins = "";
+            for(int i = 1; i<ln.size()&&ln[i]!='#';++i)
+                ins += ln[i];
+            int in = atoi(ins.c_str());
+            if(a==0)
+                {quo.quizid = in; /*cout << "quizid gelesen " << in << endl;*/}
+            else if(a==1)
+                {quo.aktuell = in; /*cout << "aktuell gelesen " << in << endl;*/}
+            ++a;
+        }
+    }
+    quo.quizid = 0;
+    quo.aktuell = 0;
+    r.close();
+    return false;
 }
 
 void ask(FRAGE & f, STATUS & quo)
@@ -267,14 +359,14 @@ void schwer(STATUS & quo)
     quo.quizid=20;
     ansage();
     int len = alllength;
-    for(int i = quo.aktuell; i<len; ++i)
-        if(quo.all[quo.perm[i]].history.size()>2)
+    for(; quo.aktuell<len; ++quo.aktuell)
+        if(quo.all[quo.perm[quo.aktuell]].history.size()>2)
         {
-            if(quo.all[quo.perm[i]].rate<=0.8)
-                ask(quo.all[quo.perm[i]], quo);
+            if(quo.all[quo.perm[quo.aktuell]].rate<=0.8)
+                ask(quo.all[quo.perm[quo.aktuell]], quo);
         }
         else
-            ask(quo.all[quo.perm[i]], quo);
+            ask(quo.all[quo.perm[quo.aktuell]], quo);
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
     quo.quizid=0;
     quo.aktuell=0;
@@ -319,9 +411,9 @@ void themenquiz(STATUS & quo)
     int th = quo.quizid-10;
     ansage();
     int len = alllength;
-    for(int i = quo.aktuell; i<len; ++i)
-        if(quo.all[quo.perm[i]].id <(th+1)*1000&&quo.all[quo.perm[i]].id>=th*1000)
-            ask(quo.all[quo.perm[i]], quo);
+    for(; quo.aktuell<len; ++quo.aktuell)
+        if(quo.all[quo.perm[quo.aktuell]].id <(th+1)*1000&&quo.all[quo.perm[quo.aktuell]].id>=th*1000)
+            ask(quo.all[quo.perm[quo.aktuell]], quo);
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
     quo.aktuell=0;
     quo.quizid=0;
@@ -354,16 +446,16 @@ void thxschwer(STATUS & quo)
     int th = quo.quizid-20;
     ansage();
     int len = alllength;
-    for(int i = quo.aktuell; i<len; ++i)
-        if(quo.all[quo.perm[i]].id <(th+1)*1000&&quo.all[quo.perm[i]].id>=th*1000)
+    for(; quo.aktuell<len; ++quo.aktuell)
+        if(quo.all[quo.perm[quo.aktuell]].id <(th+1)*1000&&quo.all[quo.perm[quo.aktuell]].id>=th*1000)
         {
-            if(quo.all[quo.perm[i]].history.size()>2)
+            if(quo.all[quo.perm[quo.aktuell]].history.size()>2)
             {
-                if(quo.all[quo.perm[i]].rate<=0.8)
-                    ask(quo.all[quo.perm[i]], quo);
+                if(quo.all[quo.perm[quo.aktuell]].rate<=0.8)
+                    ask(quo.all[quo.perm[quo.aktuell]], quo);
             }
             else
-                ask(quo.all[quo.perm[i]], quo);
+                ask(quo.all[quo.perm[quo.aktuell]], quo);
         }
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
     quo.quizid=0;
@@ -388,5 +480,6 @@ void schluss(STATUS & quo)
             o << "#" << quo.all[i].id << "#" << quo.all[i].history << endl;
         }
     o.close();
+    writestat(quo);
     exit(0);
 }
