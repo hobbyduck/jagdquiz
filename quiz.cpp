@@ -195,13 +195,25 @@ void getcommand(STATUS & quo)
     if(comm.find("exit")!=np)
         schluss(quo);
     else if(comm.find("quiz")!=np)
-        {permutiere(quo); randquiz(quo);}
+    {
+        permutiere(quo);
+        randquiz(quo);
+    }
     else if(comm.find("thschwer")!=np)
-        {permutiere(quo);thxschwer(quo);}
+    {
+        permutiere(quo);
+        thxschwer(quo);
+    }
     else if(comm.find("thema")!=np)
-        {permutiere(quo);themenquiz(quo);}
+    {
+        permutiere(quo);
+        themenquiz(quo);
+    }
     else if(comm.find("schwer")!=np)
-        {permutiere(quo);schwer(quo);}
+    {
+        permutiere(quo);
+        schwer(quo);
+    }
     else
         help();
 }
@@ -281,13 +293,17 @@ bool readstat(STATUS & quo)
         else if(ln[0]=='#')
         {
             string ins = "";
-            for(int i = 1; i<ln.size()&&ln[i]!='#';++i)
+            for(int i = 1; i<ln.size()&&ln[i]!='#'; ++i)
                 ins += ln[i];
             int in = atoi(ins.c_str());
             if(a==0)
-                {quo.quizid = in; /*cout << "quizid gelesen " << in << endl;*/}
+            {
+                quo.quizid = in; /*cout << "quizid gelesen " << in << endl;*/
+            }
             else if(a==1)
-                {quo.aktuell = in; /*cout << "aktuell gelesen " << in << endl;*/}
+            {
+                quo.aktuell = in; /*cout << "aktuell gelesen " << in << endl;*/
+            }
             ++a;
         }
     }
@@ -389,25 +405,27 @@ void help()
 void themenquiz(STATUS & quo)
 {
     if(quo.quizid==0)
-    {cout << "Themenbereiche:" << endl;
-    cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
-    cout << "2 - Biologie der WIldarten" << endl;
-    cout << "3 - Rechtliche Vorschriften" << endl;
-    cout << "4 - Wildhege, Jagdbetrieb und jagdliche Praxis" << endl;
-    cout << "5 - Jagdhundewesen" << endl;
-    cout << "6 - Naturschutz, Landbau, Forstwesen, Wild- und Jagdschadensverhuetung" << endl;
-    cout << "(Bitte Zahl eingeben) ";
-    int th;
-    string the;
-    getline(cin, the);
-    th = atoi(the.c_str());
-    while(th<1||th>6)
     {
-        cout << "ungueltig - Neue Eingabe bitte";
+        cout << "Themenbereiche:" << endl;
+        cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
+        cout << "2 - Biologie der WIldarten" << endl;
+        cout << "3 - Rechtliche Vorschriften" << endl;
+        cout << "4 - Wildhege, Jagdbetrieb und jagdliche Praxis" << endl;
+        cout << "5 - Jagdhundewesen" << endl;
+        cout << "6 - Naturschutz, Landbau, Forstwesen, Wild- und Jagdschadensverhuetung" << endl;
+        cout << "(Bitte Zahl eingeben) ";
+        int th;
+        string the;
         getline(cin, the);
         th = atoi(the.c_str());
+        while(th<1||th>6)
+        {
+            cout << "ungueltig - Neue Eingabe bitte";
+            getline(cin, the);
+            th = atoi(the.c_str());
+        }
+        quo.quizid=10+th;
     }
-    quo.quizid=10+th;}
     int th = quo.quizid-10;
     ansage();
     int len = alllength;
@@ -424,24 +442,24 @@ void thxschwer(STATUS & quo)
     if(quo.quizid==0)
     {
         cout << "Themenbereiche:" << endl;
-    cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
-    cout << "2 - Biologie der WIldarten" << endl;
-    cout << "3 - Rechtliche Vorschriften" << endl;
-    cout << "4 - Wildhege, Jagdbetrieb und jagdliche Praxis" << endl;
-    cout << "5 - Jagdhundewesen" << endl;
-    cout << "6 - Naturschutz, Landbau, Forstwesen, Wild- und Jagdschadensverhuetung" << endl;
-    cout << "(Bitte Zahl eingeben) ";
-    int th;
-    string the;
-    getline(cin, the);
-    th = atoi(the.c_str());
-    while(th<1||th>6)
-    {
-        cout << "ungueltig - Neue Eingabe bitte";
+        cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
+        cout << "2 - Biologie der WIldarten" << endl;
+        cout << "3 - Rechtliche Vorschriften" << endl;
+        cout << "4 - Wildhege, Jagdbetrieb und jagdliche Praxis" << endl;
+        cout << "5 - Jagdhundewesen" << endl;
+        cout << "6 - Naturschutz, Landbau, Forstwesen, Wild- und Jagdschadensverhuetung" << endl;
+        cout << "(Bitte Zahl eingeben) ";
+        int th;
+        string the;
         getline(cin, the);
         th = atoi(the.c_str());
-    }
-    quo.quizid=20+th;
+        while(th<1||th>6)
+        {
+            cout << "ungueltig - Neue Eingabe bitte";
+            getline(cin, the);
+            th = atoi(the.c_str());
+        }
+        quo.quizid=20+th;
     }
     int th = quo.quizid-20;
     ansage();
