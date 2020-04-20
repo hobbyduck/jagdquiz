@@ -60,6 +60,7 @@ void permutiere(STATUS & quo);
 void themenquiz(STATUS & quo);
 void schwer(STATUS & quo);
 void thxschwer(STATUS & quo);
+void frag(STATUS & quo);
 void help();
 void ansage();
 void schluss(STATUS & quo);
@@ -147,6 +148,7 @@ int main()
     else
         cout << "Kein Verlauf vorhanden" << endl;
     r.close();
+
     cout << "Versuche Zwischenspeicher zu laden" << endl;
     if(readstat(quo))
     {
@@ -194,6 +196,10 @@ void getcommand(STATUS & quo)
     size_t np = string::npos;
     if(comm.find("exit")!=np)
         schluss(quo);
+    else if(comm.find("frage")!=np)
+    {
+        frag(quo);
+    }
     else if(comm.find("quiz")!=np)
     {
         permutiere(quo);
@@ -391,6 +397,7 @@ void schwer(STATUS & quo)
 void help()
 {
     cout << "Moegliche Kommandos:" << endl;
+    cout << "frage -    Eine einzelne Frage, ID wird abgefragt" << endl;
     cout << "quiz -     Alle Fragen aus allen Themenbereichen in zu-" << endl;
     cout << "           faelliger Reihenfolge" << endl;
     cout << "thema -    Alle Fragen aus einem waehlbaren Themenbereich in" << endl;
@@ -408,7 +415,7 @@ void themenquiz(STATUS & quo)
     {
         cout << "Themenbereiche:" << endl;
         cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
-        cout << "2 - Biologie der WIldarten" << endl;
+        cout << "2 - Biologie der Wildarten" << endl;
         cout << "3 - Rechtliche Vorschriften" << endl;
         cout << "4 - Wildhege, Jagdbetrieb und jagdliche Praxis" << endl;
         cout << "5 - Jagdhundewesen" << endl;
@@ -443,7 +450,7 @@ void thxschwer(STATUS & quo)
     {
         cout << "Themenbereiche:" << endl;
         cout << "1 - Jagdwaffen, Jagd- und Fanggeraete" << endl;
-        cout << "2 - Biologie der WIldarten" << endl;
+        cout << "2 - Biologie der Wildarten" << endl;
         cout << "3 - Rechtliche Vorschriften" << endl;
         cout << "4 - Wildhege, Jagdbetrieb und jagdliche Praxis" << endl;
         cout << "5 - Jagdhundewesen" << endl;
@@ -478,6 +485,24 @@ void thxschwer(STATUS & quo)
     cout << "Quiz abgeschlossen - 'exit' zum Speichern und Schliessen" << endl;
     quo.quizid=0;
     quo.aktuell=0;
+}
+
+void frag(STATUS & quo)
+{
+    cout << "Welche Frage?" << endl;
+    string ine;
+    getline(cin, ine);
+    int in = atoi(ine.c_str());
+    bool gefragt = false;
+    for(int i = 0; i<alllength; ++i)
+        if(quo.all[i].id == in)
+        {
+            cout << i << endl;
+            ask(quo.all[i], quo);
+            gefragt = true;
+        }
+    if(!gefragt)
+        cout << "ID nicht gefunden" << endl;
 }
 
 void ansage()
