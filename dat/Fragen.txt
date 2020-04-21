@@ -5600,7 +5600,7 @@
 -Feuer darf nur ausserhalb des Waldes und im Wald nur in den Wintermonaten entfacht werden
 #6166#Duerfen Sie mit Zustimmung des Grundstueckseigentuemers und ohne behoerdliche Genehmigung in dessen Wald eine Fichtendickung beseitigen, um auf der Flaeche von 0,3 ha einen Wildacker anzulegen?
 -Nein, Wald muss Wald bleiben
--Die Fichtendickung darf nur beseitigt werden, wenn in unmittelbarer Naehe eine
+-Die Fichtendickung darf nur beseitigt werden, wenn in unmittelbarer Naehe eine Ersatzaufforstung erfolgt
 +Ja, ein Wildacker ist eine dem Wald gleichgestellte Flaeche
 #6167#Welche der nachgenannten Aussagen zur nachhaltigen Waldbewirtschaftung ist richtig?
 +Die Gesamthoehe des Holzeinschlages ist grundsaetzlich nicht hoeher als der Holzzuwachs
