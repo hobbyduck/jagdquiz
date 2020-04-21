@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -49,6 +50,9 @@ public:
     int quizid;
 };
 
+STATUS * speicher;
+
+void exiting();
 void getcommand(STATUS & quo);
 bool readstat(STATUS & quo);
 void writestat(STATUS & quo);
@@ -67,7 +71,9 @@ void schluss(STATUS & quo);
 
 int main()
 {
+    atexit(exiting);
     STATUS quo;
+    speicher = &quo;
     quo.aktuell=0;
     quo.quizid=0;
     ifstream r;
@@ -186,6 +192,11 @@ int main()
     while(true)
         getcommand(quo);
     return 0;
+}
+
+void exiting()
+{
+    schluss(*speicher);
 }
 
 void getcommand(STATUS & quo)
