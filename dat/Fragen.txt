@@ -211,7 +211,7 @@
 +Ja
 -Nein
 #1054#Welche der nachgenannten Patronen ist fuer die Verwendung in Repetiergewehren bestimmt?
-+8 x 57 IR
++8 x 57 IS
 -8 x 57 IRS
 #1055#Anhand welcher Merkmal unterscheiden sich die Patronen 7 x 57 R und 7 x 57?
 +Die Patrone 7 x 57 R hat am Huelsenboden einen Rand
