@@ -1497,7 +1497,7 @@
 -Fuechse meiden staedtische Bereiche
 #2142#Welche nachgenannte Aussage zum Fischotter ist richtig?
 -Der Fischotter ernaehrt sich ausschliesslich von Fischen
--Bei ausgewachsenen Fischottern lassen sich Faehe und Ruede anhand der Koerpergroesse
+-Bei ausgewachsenen Fischottern lassen sich Faehe und Ruede anhand der Koerpergroesse deutlich unterscheiden
 +Durch den Abdruck der Schwimmhaeute laesst sich seine Spur von anderen unterscheiden
 #2143#Welche der nachgenannten Wildarten gehoeren zur Familie der Marder?
 -Marderhund
@@ -1678,7 +1678,7 @@
 +Auerwild
 #2174#Welche der nachgenannten Aussagen ueber den Lebensraum des Auerwildes ist richtig?
 -Auerwild bevorzugt dichte, geschlossene Plenterwaldstrukturen mit hohem Laubholzanteil
-+Das Auerwild bevorzugt altholzreiche, zum Teil aufgelichtete Bergwaldstrukturen mit reichlich
++Das Auerwild bevorzugt altholzreiche, zum Teil aufgelichtete Bergwaldstrukturen mit reichlich Beerenkraut am Boden
 -Almflaechen
 #2175#Welche der nachgenannten Pflanzen ist fuer die Sommeraesung des Auerwildes von Bedeutung?
 -Adlerfarn
